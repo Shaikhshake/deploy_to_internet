@@ -1,0 +1,17 @@
+{
+  "name": "simplewebserver",
+  "version": "1.0.0",
+  "description": "A project to learn about express and node.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "test": "echo \"No test specified\" && exit 1"
+  },
+  "author": "Shaikhshake",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  }
+}

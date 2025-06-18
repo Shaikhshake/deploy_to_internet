@@ -1,0 +1,18 @@
+h1 {
+    color: green;
+}
+
+
+button:hover{
+    color: white;
+    background-color: black;
+}
+
+.error {
+    width: 40px;
+    height: auto;
+    border: 1px solid red;
+    background-color: rgb(160, 109, 109);
+    color: rgb(18, 6, 6);
+
+}
