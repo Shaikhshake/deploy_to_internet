@@ -54,6 +54,8 @@ app.get('/api/notes', (request, response) => {
 
 app.delete('/api/notes/:id', (request, response) => {
     const id = request.params.id
+    Note.findByIdAndDelete(id)
+        .then(result => console.log("deleted: ", result))
     notes = notes.filter(note => note.id !== id)
     response.status(204).end()
 })
@@ -80,19 +82,25 @@ app.post('/api/notes', (request, response) => {
             error: 'content missing'
         })
     }
-    const note = {
+    const note = new Note({
         content: body.content,
         important: body.important || false,
-        id: generateId()
-    }
+    })
 
-    console.log(note)
-    notes = notes.concat(note)
-    response.json(note)
+    note.save()
+        .then(savedNote => {
+            response.json(savedNote)
+        })
+        .catch(error => console.log("error: ", error))
 })
 
 app.put('/api/notes/:id', (request, response)=> {
     console.log("request.body:", request.params)
+    const id = request.params.id
+    Note.findByIdAndUpdate(
+        id,
+        {$bit: {important: {xor : 1}}}
+    )
     const noteTobeChanged = notes.find(note => note.id === request.params.id)
     if(noteTobeChanged === undefined){
         return response.status(404).send({error: "No such note exists"})
