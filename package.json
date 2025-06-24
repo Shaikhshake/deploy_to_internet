@@ -6,12 +6,15 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "echo \"No test specified\" && exit 1"
+    "test": "echo \"No test specified\" && exit 1",
+    "build:ui": "rm -rf dist && cd ../introdemo/ && npm run build && cp -r dist ../deploy_to_internet",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuilt && git push -u origin main"
   },
   "author": "Shaikhshake",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "mongoose": "^8.16.0"
   }
 }

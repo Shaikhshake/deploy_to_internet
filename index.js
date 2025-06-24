@@ -14,7 +14,7 @@ app.use(express.static('dist'))
 app.use(express.json())
 app.use(requestLogger)
 
-
+const Note = require('./models/notes')
 let notes = [
     {
       id: "1",
@@ -45,8 +45,10 @@ app.get('/', (request, response) => {
 
 app.get('/api/notes', (request, response) => {
     // console.log('request from /api/notes: ', Object.keys(request))
-
-    response.json(notes)
+    Note.find({})
+        .then(notes => response.json(notes))
+        .catch(error => console.log("error: ", error))
+    // response.json(notes)
 })
 
 app.delete('/api/notes/:id', (request, response) => {
