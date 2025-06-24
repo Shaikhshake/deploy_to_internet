@@ -11,32 +11,33 @@ const requestLogger = (request, response, next) => {
     console.log("---")
     next()
 }
+
 app.use(express.static('dist'))
 app.use(express.json())
 app.use(requestLogger)
 
 const Note = require('./models/notes')
-let notes = [
-    {
-      id: "1",
-      content: "HTML is easy",
-      important: true
-    },
-    {
-      id: "2",
-      content: "Browser can execute only JavaScript",
-      important: false
-    },
-    {
-      id: "3",
-      content: "GET and POST are the most important methods of HTTP protocol",
-      important: true
-    },{
-        id: "5",
-        content: "ET and POST of HTTP protocol",
-        important: false
-      }
-  ]
+// let notes = [
+//     {
+//       id: "1",
+//       content: "HTML is easy",
+//       important: true
+//     },
+//     {
+//       id: "2",
+//       content: "Browser can execute only JavaScript",
+//       important: false
+//     },
+//     {
+//       id: "3",
+//       content: "GET and POST are the most important methods of HTTP protocol",
+//       important: true
+//     },{
+//         id: "5",
+//         content: "ET and POST of HTTP protocol",
+//         important: false
+//       }
+//   ]
 
 
 app.get('/', (request, response) => {
@@ -62,9 +63,24 @@ app.delete('/api/notes/:id', (request, response) => {
 
 app.get('/api/notes/:id', (request, response) => {
     const id = request.params.id
-    const note = notes.find(note => note.id === id)
-    response.statusMessage = "Oops, no such note exists"
-    note === undefined? response.status(404).end() :response.json(note)
+    Note.findById(id)
+        .then(note => 
+            {
+                if (note) {
+                    response.json(note)
+                }
+                else{
+                    response.status(404).send()
+                }
+            }
+            )
+        .catch(error => {
+            console.log("error: ", error)
+            response.status(400).send({error: 'malformed id'})
+        })
+    // const note = notes.find(note => note.id === id)
+    // response.statusMessage = "Oops, no such note exists"
+    // note === undefined? response.status(404).end() :response.json(note)
     
 })
 
@@ -95,23 +111,20 @@ app.post('/api/notes', (request, response) => {
 })
 
 app.put('/api/notes/:id', (request, response)=> {
-    console.log("request.body:", request.params)
+    const {content , important} = request.body
     const id = request.params.id
-    Note.findByIdAndUpdate(
-        id,
-        {$bit: {important: {xor : 1}}}
-    )
-    const noteTobeChanged = notes.find(note => note.id === request.params.id)
-    if(noteTobeChanged === undefined){
-        return response.status(404).send({error: "No such note exists"})
-    }
-    const newNote = {
-        id: noteTobeChanged.id,
-        content: noteTobeChanged.content,
-        important: !noteTobeChanged.important
-    }
-    notes = notes.map(note => note.id === noteTobeChanged.id? newNote : note)
-    response.json(newNote)
+    Note.findById(id)
+        .then(note => {
+            if (!note){
+                return response.status(404).end()
+            }
+            note.content = content
+            note.important = important
+            return note.save().then(updatedNote => {
+                response.json(updatedNote)
+            }).catch(error => console.log("error: ", error))
+            
+        })
 
 })
 
