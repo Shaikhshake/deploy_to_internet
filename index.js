@@ -56,9 +56,12 @@ app.get('/api/notes', (request, response) => {
 app.delete('/api/notes/:id', (request, response) => {
     const id = request.params.id
     Note.findByIdAndDelete(id)
-        .then(result => console.log("deleted: ", result))
-    notes = notes.filter(note => note.id !== id)
-    response.status(204).end()
+        .then(result => {
+            console.log("deleted: ", result)
+            response.status(204).end()
+        })
+        .catch(error => console.log("Encountered error while deleting: ", error))
+    
 })
 
 app.get('/api/notes/:id', (request, response) => {
