@@ -88,19 +88,19 @@ app.get('/api/notes/:id', (request, response) => {
 })
 
 
-const generateId = () => {
-    const maxId = notes.length > 0? Math.max(...notes.map(note => Number(note.id))): 0
+// const generateId = () => {
+//     const maxId = notes.length > 0? Math.max(...notes.map(note => Number(note.id))): 0
 
-    return String(maxId + 1)
-}
+//     return String(maxId + 1)
+// }
 
-app.post('/api/notes', (request, response) => {
+app.post('/api/notes', (request, response, next) => {
     const body = request.body
-    if(!body.content){
-        return response.status(400).json({
-            error: 'content missing'
-        })
-    }
+    // if(!body.content){
+    //     return response.status(400).json({
+    //         error: 'content missing'
+    //     })
+    // }
     const note = new Note({
         content: body.content,
         important: body.important || false,
@@ -110,7 +110,7 @@ app.post('/api/notes', (request, response) => {
         .then(savedNote => {
             response.json(savedNote)
         })
-        .catch(error => console.log("error: ", error))
+        .catch(error => next(error))
 })
 
 app.put('/api/notes/:id', (request, response)=> {
@@ -137,6 +137,18 @@ const unknownEndpoints = (request, response) => {
 }
 app.use(unknownEndpoints)
 
+
+const errorHandler = (error, request, response, next) => {
+    console.log("Error: ", error.message)
+
+    if (error.name === 'CastError'){
+        return response.status(400).send({error: "Malformed ID"})
+    }
+    if (error.name === 'ValidationError'){//occurs if field rules arent followed
+        return response.status(400).send({error: error.message})
+    }
+    next(error)
+}
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`))
