@@ -1,4 +1,5 @@
 const {test, after} = require('node:test')
+const assert = require('node:assert')
 const mongoose = require("mongoose")
 const supertest = require('supertest')
 const app = require('../app')
@@ -11,10 +12,18 @@ test('notes are returned as json', async function() {
         .get('/api/notes')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-        // .end(function(err, res) {
-        //     if (err) console.log(err)
-        //     // else console.log(res)
-        // })
+})
+
+test('all notes are returned', async () => {
+    const response = await api.get('/api/notes')
+
+    assert.strictEqual(response.body.length, 2)
+})
+
+test('wicked is in there', async () => {
+    const response = await api.get('/api/notes')
+    console.log(response.body)
+    assert(response.body.map(note => note.content).includes("wicked"))
 })
 
 after(async function() {
