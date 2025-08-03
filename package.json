@@ -4,9 +4,9 @@
   "description": "A project to learn about express and node.js",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js",
-    "test": "echo \"No test specified\" && exit 1",
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development node --watch index.js",
+    "test": "cross-env NODE_ENV=test node --test",
     "build:ui": "rm -rf dist && cd ../introdemo/ && npm run build && cp -r dist ../deploy_to_internet",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuilt && git push -u origin main"
   },
@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "cross-env": "^10.0.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "mongoose": "^8.16.0"
