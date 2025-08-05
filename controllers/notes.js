@@ -3,8 +3,14 @@ const Note = require('../models/note')
 
 
 notesRouter.get('/', async (request, response, next) => {
-    const note = await Note.find({})
-    response.json(note)
+    try {
+        const note = await Note.find({})
+        response.json(note)
+    }
+    catch (exception){
+        next(exception)
+    }
+    
     // Note.find({})
     //     .then(notes => {
     //         response.json(notes)
@@ -14,11 +20,16 @@ notesRouter.get('/', async (request, response, next) => {
 
 notesRouter.get("/:id", async (request, response, next) => {
 
-    const note = await Note.findById(request.params.id)
+    try {
+        const note = await Note.findById(request.params.id)
 
-    note? 
-        response.json(note)
-        :response.status(404).end()
+        note? 
+            response.json(note)
+            :response.status(404).end()
+    }
+    catch(exception){
+        next(exception)
+    }
 
 
     // Note.findById(request.params.id)
@@ -40,8 +51,14 @@ notesRouter.post("/", async (request, response, next) => {
         important: body.important || false,
     })
 
-    const savedNote = await newNote.save()
-    response.json(savedNote)
+    try {
+        const savedNote = await newNote.save()
+        response.status(201).json(savedNote)   
+    }
+    catch(exception) {
+        next(exception)
+    }
+    
     
     // newNote.save()
     //     .then(savedNote => response.json(savedNote))
@@ -50,8 +67,14 @@ notesRouter.post("/", async (request, response, next) => {
 
 notesRouter.delete('/:id', async (request, response, next) => {
 
-    await Note.findByIdAndDelete(request.params.id)
-    response.status(204).end()
+    try{
+        await Note.findByIdAndDelete(request.params.id)
+        response.status(204).end()
+    }
+    catch(exception) {
+        next(exception)
+    }
+    
     // Note.findByIdAndDelete(request.params.id)
     //     .then(() => {
     //         response.status(204).end()
@@ -63,13 +86,18 @@ notesRouter.put("/:id", async  (request, response, next) => {
     const noteID = request.params.id
     const {content, important} = request.body
 
-    const note = await Note.findById(noteID)
-    if (!note) return response.status(404).end()
-    else {
-        note.content = content
-        note.important = important || false
-        const savedNote = await note.save()
-        response.json(savedNote)
+    try {    
+        const note = await Note.findById(noteID)
+        if (!note) return response.status(404).end()
+        else {
+            note.content = content
+            note.important = important || false
+            const savedNote = await note.save()
+            response.json(savedNote)
+        }
+    }
+    catch(exception) {
+        next(exception)
     }
 
     // Note.findById(noteID)
