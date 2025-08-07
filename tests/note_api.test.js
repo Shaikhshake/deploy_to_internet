@@ -4,7 +4,7 @@ const mongoose = require("mongoose")
 const supertest = require('supertest')
 const app = require('../app')
 const Note = require('../models/note')
-const note = require('../models/note')
+
 const {initialNotes, getNonExistingId, getNotesInDb, } = require('./test_helper')
 
 
@@ -15,19 +15,20 @@ const api = supertest(app)
 
 beforeEach(async () => {
     await Note.deleteMany({});
+    await Note.insertMany(initialNotes)
 
-    const noteObj = initialNotes.map(note => new Note(note))
-    //noteobj.save returns a promise immediately
-    const promiseArray = noteObj.map(noteObj => noteObj.save())
+    // const noteObj = initialNotes.map(note => new Note(note))
+    // //noteobj.save returns a promise immediately
+    // const promiseArray = noteObj.map(noteObj => noteObj.save())
     
 
-    //Promise.all(iterable) takes an iterable(arrays of promises usually) and returns a new promise which is only resolved when all of them  are resolved.
-    try {
-        await Promise.all(promiseArray)
-    }
-    catch (exception){
-        console.log("HEREES THE EXCEPPPPPPTTTTTTTTTTTTIONONONONONOOONONO:::", exception)
-    }
+    // //Promise.all(iterable) takes an iterable(arrays of promises usually) and returns a new promise which is only resolved when all of them  are resolved.
+    // try {
+    //     await Promise.all(promiseArray)
+    // }
+    // catch (exception){
+    //     console.log("HEREES THE EXCEPPPPPPTTTTTTTTTTTTIONONONONONOOONONO:::", exception)
+    // }
     
 
     //This code below wont work as each iteration of foreach
@@ -42,6 +43,13 @@ beforeEach(async () => {
     //         next(exception)
     //     }
     // })
+
+
+    //Code below will absolutely work
+    // for (let note of helper.initialNotes) {
+    //     let noteObject = new Note(note)
+    //     await noteObject.save()
+    // }
     // let noteObj = new Note(initialNotes[0])
     // await noteObj.save()
     // noteObj = new Note(initialNotes[1])
@@ -100,6 +108,8 @@ test("empty note cannot be added", async () => {
     assert.strictEqual(notesAtEndOfPost.length, initialNotes.length)
 
 })
+
+
 
 
 after(async function() {
