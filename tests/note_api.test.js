@@ -1,11 +1,19 @@
-const {test, after, beforeEach} = require('node:test')
+const {test, after, beforeEach, describe} = require('node:test')
 const assert = require('node:assert')
 const mongoose = require("mongoose")
 const supertest = require('supertest')
 const app = require('../app')
 const Note = require('../models/note')
 
-const {initialNotes, getNonExistingId, getNotesInDb, } = require('./test_helper')
+const {
+    initialNotes, 
+    getNonExistingId, 
+    getNotesInDb, 
+    getUsersInDb } = require('./test_helper')
+
+
+const User = require('../models/user')
+
 
 
 
@@ -78,9 +86,19 @@ test('wicked is in there', async () => {
 })
 
 test('new note can be added', async () => {
+    const dummyUser = {
+        username: "test",
+        name: "test",
+        password: "test"
+    }
+
+    const newUser = new User(dummyUser)
+    const result = await newUser.save()
+    console.log("RESULTTTTSSSS: ", result)
     const newNote = {
         content: "async/await is cleaner",
         important: true,
+        userId: result._id
     };
 
     await api
@@ -110,6 +128,62 @@ test("empty note cannot be added", async () => {
 })
 
 
+describe("when there are no users in DB", async () => {
+    beforeEach( async () => {
+        await User.deleteMany({})
+    })
+
+    test("One user with userName is root can be added", async () => {
+        const dummy1 = {
+            username: 'root',
+            name: 'Superuser',
+            password: 'hiya'
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(dummy1)
+            .expect(201)
+            .expect("Content-Type", /application\/json/)
+    })
+
+    test("cannot add user with the same name", async () => {
+
+        
+
+        const dummy1 = {
+            username: 'root',
+            name: 'Superuser',
+            password: 'hiya'
+        }
+        const result = await api
+            .post('/api/users')
+            .send(dummy1)
+            .expect(201)
+            .expect("Content-Type", /application\/json/)
+        
+            
+        const usersAtStart = await getUsersInDb()
+
+        const dummy2 = {
+            username: 'root',
+            name: 'notme',
+            password: 'kyeee'
+        }
+
+        const newResult = await api
+            .post('/api/users')
+            .send(dummy2)
+            .expect(400)
+            .expect("Content-Type", /application\/json/)
+
+
+        const usersAtEnd = await getUsersInDb()
+        assert(newResult.body.error.includes("Expected `username` to be unique"))
+
+        assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
+})
 
 
 after(async function() {

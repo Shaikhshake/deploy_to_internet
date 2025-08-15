@@ -1,7 +1,10 @@
+
 POST http://localhost:3001/api/notes
 content-type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im5vdHJvb3QiLCJpZCI6IjY4OTVjYTYzZjJjMzg3NjI2ZTAxMjc3MSIsImlhdCI6MTc1NTI1MTI2NiwiZXhwIjoxNzU1MjU0ODY2fQ.0YjHeW3CaNeG8A6c8VjexnHeWL7r9soCXxAjtseccRQ
 
 {
-    "content" : "vs codedd rest",
-    "important" : true
+    "content" : " rest",
+    "important" : true,
+    "userId": "6894f0601e9c459693962451"
 }
